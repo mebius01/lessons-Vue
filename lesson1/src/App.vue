@@ -1,9 +1,17 @@
 <template>
   <div id="app">
     <div>
-      <button @click="postUser">Post User</button>
+      <input type="text" v-model="article.title">
+      <br>
+      <textarea v-model="article.body"></textarea>
+      <br>
+      <button @click="sendArticle">Send Article</button>
     </div>
     <div class="container">
+      <div class="card" v-if="status">
+         <h3>{{ newArticle.title }}</h3>
+         <p>{{ newArticle.body }}</p>
+      </div>
       <div class="card" v-for="(item, index) in posts" :key="index">
         <h3>{{ item.title }}</h3>
         <p>{{ item.body }}</p>
@@ -19,9 +27,10 @@ export default {
   data: () => ({
     posts: null,
     status: null,
+    newArticle: null,
     article: {
-      title: "TTTT",
-      body: "TTTT"
+      title: null,
+      body: null
     },
     getArticles: "https://jsonplaceholder.typicode.com/posts",
     postArticles: "https://jsonplaceholder.typicode.com/posts"
@@ -33,11 +42,12 @@ export default {
     console.log(this.article.title);
   },
   methods: {
-    postUser: () => {
-      axios.post("https://jsonplaceholder.typicode.com/posts", {str: "title"})
+    sendArticle: function() {
+      axios.post(this.postArticles, this.article)
             .then((response) => {
-            console.log(response);
-  })
+              this.newArticle = response.data
+              this.status = response.status
+            })
     }
   }
 };
@@ -45,6 +55,25 @@ export default {
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
+  input {
+    display: flex;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 50%;
+    border: none;
+    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    margin: 10px auto 10px;
+  }
+  textarea {
+    @extend input;
+    height: 60px;
+  }
+  button {
+    @extend input;
+    height: 30px;
+  }
   .container {
     margin: 30px;
     display: grid;
