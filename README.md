@@ -8,6 +8,7 @@
 [v-for](#v-for)  
 [v-model](#v-model)   
 [v-on](#v-on)  
+[axios](#axios)
 
 
 
@@ -209,5 +210,37 @@ export default {
   data: () => ({
      inputMsg: null
   }),
+};
+```
+<a name="axios"><h2>axios</h2></a>
+Извлечём и сохраним данные, используя хук жизненного цикла **mounted**
+
+```html
+<template>
+  <div id="app">
+    <div class="container">
+      <div class="card" v-for="(item, index) in posts" :key="index">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.body }}</p>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+```javascript
+import axios from 'axios'
+export default {
+  name: "App",
+  data: () => ({
+    posts: null,
+    status: null,
+    rootUrl: "https://jsonplaceholder.typicode.com"
+  }),
+  mounted() {
+    axios.get(`${this.rootUrl}/posts`)
+         .then(response => (this.posts = response.data))
+         .catch(error => console.error(error));
+  },
 };
 ```
