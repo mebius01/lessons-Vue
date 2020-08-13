@@ -213,6 +213,12 @@ export default {
 };
 ```
 <a name="axios"><h2>axios</h2></a>
+
+[get](#get)  
+[post](#post)  
+
+<a name="get"><h3>get</h3></a>
+
 Извлечём и сохраним данные, используя хук жизненного цикла **mounted**
 
 ```html
@@ -242,5 +248,51 @@ export default {
          .then(response => (this.posts = response.data))
          .catch(error => console.error(error));
   },
+};
+```
+
+<a name="post"><h3>post</h3></a>
+
+```html
+<template>
+  <div id="app">
+    <div>
+      <input type="text" v-model="article.title">
+      <br>
+      <textarea v-model="article.body"></textarea>
+      <br>
+      <button @click="sendArticle">Send Article</button>
+    </div>
+    <div class="container">
+      <div class="card" v-if="status">
+          <h3>{{ newArticle.title }}</h3>
+          <p>{{ newArticle.body }}</p>
+      </div>
+  </div>
+</template>
+```
+
+```javascript
+import axios from 'axios'
+export default {
+  name: "App",
+  data: () => ({
+    status: null,
+    newArticle: null,
+    article: {
+      title: null,
+      body: null
+    },
+    postArticles: "https://jsonplaceholder.typicode.com/posts"
+  }),
+  methods: {
+    sendArticle: function() {
+      axios.post(this.postArticles, this.article)
+            .then((response) => {
+              this.newArticle = response.data
+              this.status = response.status
+            })
+    }
+  }
 };
 ```

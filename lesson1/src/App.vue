@@ -1,55 +1,26 @@
 <template>
   <div id="app">
-    <div>
-      <input type="text" v-model="article.title">
-      <br>
-      <textarea v-model="article.body"></textarea>
-      <br>
-      <button @click="sendArticle">Send Article</button>
-    </div>
-    <div class="container">
-      <div class="card" v-if="status">
-         <h3>{{ newArticle.title }}</h3>
-         <p>{{ newArticle.body }}</p>
-      </div>
-      <div class="card" v-for="(item, index) in posts" :key="index">
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.body }}</p>
-      </div>
-    </div>
+    <h1>Test Componets</h1>
+    <hr>
+    <CompTest v-bind:datalist="dataList"/>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import CompTest from './components/CompTest'
 export default {
   name: "App",
-  data: () => ({
-    posts: null,
-    status: null,
-    newArticle: null,
-    article: {
-      title: null,
-      body: null
-    },
-    getArticles: "https://jsonplaceholder.typicode.com/posts",
-    postArticles: "https://jsonplaceholder.typicode.com/posts"
-  }),
-  mounted() {
-    axios.get(this.getArticles)
-         .then(response => (this.posts = response.data))
-         .catch(error => console.error(error));
-    console.log(this.article.title);
+  components: {
+    CompTest,
   },
-  methods: {
-    sendArticle: function() {
-      axios.post(this.postArticles, this.article)
-            .then((response) => {
-              this.newArticle = response.data
-              this.status = response.status
-            })
-    }
-  }
+  data: () => ({
+    dataList: [
+      {id:1, task:"task 1", completed: false},
+      {id:2, task:"task 2", completed: false},
+      {id:3, task:"task 3", completed: false},
+      {id:4, task:"task 4", completed: true},
+    ] 
+  }),
 };
 </script>
 <style lang="scss">
@@ -63,7 +34,7 @@ export default {
     height: 30px;
     width: 50%;
     border: none;
-    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+    box-shadow: inset 0px 0px 5px -1px rgba(0,0,0,0.75);
     margin: 10px auto 10px;
   }
   textarea {
@@ -73,6 +44,8 @@ export default {
   button {
     @extend input;
     height: 30px;
+    background-color: rgba(0, 88, 43, 0.5);
+    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
   }
   .container {
     margin: 30px;
