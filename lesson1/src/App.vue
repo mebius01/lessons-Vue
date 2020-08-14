@@ -1,17 +1,19 @@
 <template>
   <div id="app">
     <h1>Test Componets</h1>
-    <hr>
-    <CompTest v-bind:datalist="dataList"/>
+    <CompList 
+      :datalist="dataList"
+      @remove-item="removeItem"
+      />
   </div>
 </template>
 
 <script>
-import CompTest from './components/CompTest'
+import CompList from './components/CompList'
 export default {
   name: "App",
   components: {
-    CompTest,
+    CompList,
   },
   data: () => ({
     dataList: [
@@ -21,9 +23,15 @@ export default {
       {id:4, task:"task 4", completed: true},
     ] 
   }),
+  methods: {
+    removeItem (id) {
+      console.log(`App Vue ${id}`)
+      // this.dataList = this.dataList.filter(t => t.id !==id)
+    }
+  }
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   input {

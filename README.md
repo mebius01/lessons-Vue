@@ -8,11 +8,12 @@
 [v-for](#v-for)  
 [v-model](#v-model)   
 [v-on](#v-on)  
-[axios](#axios)
+[axios](#axios)  
+[Передача данных между компонентами](#props_emit)
 
 
 
-<a name="rendering"><h2>Декларативная отрисовка</h2></a>
+<a name="rendering"><h2>rendering</h2></a>
 ```html
 <div id="app">
   {{ msg }}
@@ -292,6 +293,126 @@ export default {
               this.newArticle = response.data
               this.status = response.status
             })
+    }
+  }
+};
+```
+
+<a name="props_emit"><h3>props_emit</h3></a>
+
+[parent-child](#parent-child)  
+[child-parent](#child-parent)  
+
+<a name="parent-child"></a>
+<h3>parent-child</h3>   
+
+С помощью директивы **v-bind** создаем атрибут **datalist**  
+и как значение этого атрибут передаем массив **dataList**
+
+```html
+<template>
+  <div id="app">
+    <h1>Test Componets</h1>
+    <CompList 
+      v-bind:datalist="dataList"
+      />
+  </div>
+</template>
+```
+
+```javascript
+import CompList from './components/CompList'
+export default {
+  name: "App",
+  components: {
+    CompList,
+  },
+  data: () => ({
+    dataList: [
+      {id:1, task:"task 1", completed: false},
+      {id:2, task:"task 2", completed: false},
+      {id:3, task:"task 3", completed: false},
+      {id:4, task:"task 4", completed: true},
+    ] 
+  })
+};
+```
+
+В секции скрип получаем данные через **props**  
+Вкомпоненте CompList работаем с **datalist**  
+
+```html
+<template>
+  <div>
+      <ul>
+        <li v-for="(item, index) in datalist" :key="index">
+          {{ item.task }}
+        </li>
+      </ul>
+  </div>
+</template>
+```
+
+```javascript
+export default {
+  props: ['datalist'],
+}
+```
+
+<a name="child-parent"><h3>child-parent</h3></a>
+
+Передача данных от Ребенка к Родителю осуществляется через **emit**  
+На кнопку вешается событие **@click="$emit('remove-item', item.id)**  
+* **'remove-item'** - имя события
+* **item.id** - данные  
+
+```html
+<template>
+  <div>
+      <ul>
+        <li v-for="(item, index) in datalist"
+          :key="index">
+          {{ item.task }}
+          <button @click="$emit('remove-item', item.id)">X</button>
+        </li>
+      </ul>
+  </div>
+</template>
+```
+В родительском App в компоненте CompList слушаем событие **'remove-item'** и обработчик события **removeItem**
+
+```html
+<template>
+  <div id="app">
+    <h1>Test Componets</h1>
+    <CompList 
+      :datalist="dataList"
+      @remove-item="removeItem"
+      />
+  </div>
+</template>
+```
+
+**removeItem** это функция в секции **methods**  
+
+```javascript
+import CompList from './components/CompList'
+export default {
+  name: "App",
+  components: {
+    CompList,
+  },
+  data: () => ({
+    dataList: [
+      {id:1, task:"task 1", completed: false},
+      {id:2, task:"task 2", completed: false},
+      {id:3, task:"task 3", completed: false},
+      {id:4, task:"task 4", completed: true},
+    ] 
+  }),
+  methods: {
+    removeItem (id) {
+      console.log(`App Vue ${id}`)
     }
   }
 };
