@@ -1,75 +1,72 @@
 <template>
   <div id="app">
-    <h1>Test Componets</h1>
-    <CompList 
-      :datalist="dataList"
-      @remove-item="removeItem"
-      />
+    <nav>
+      <ul>
+        <li><router-link to="/">Home Component</router-link></li>
+        <li><router-link to="/i">Component I</router-link></li>
+        <li><router-link to="/ii">Component II</router-link></li>
+      </ul>
+    </nav>
+    <h2>{{str | uppercase}}</h2>
+    <img src="./img/logo.png" alt="">
+    <router-view />
   </div>
 </template>
 
 <script>
-import CompList from './components/CompList'
 export default {
   name: "App",
-  components: {
-    CompList,
-  },
   data: () => ({
-    dataList: [
-      {id:1, task:"task 1", completed: false},
-      {id:2, task:"task 2", completed: false},
-      {id:3, task:"task 3", completed: false},
-      {id:4, task:"task 4", completed: true},
-    ] 
+    completed: false,
+    str: "String"
   }),
-  methods: {
-    removeItem (id) {
-      console.log(`App Vue ${id}`)
-      // this.dataList = this.dataList.filter(t => t.id !==id)
+  filters: {
+    uppercase(value) {
+      return value.toUpperCase()
     }
   }
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  input {
-    display: flex;
-    justify-self: center;
-    justify-content: center;
-    align-items: center;
-    height: 30px;
-    width: 50%;
-    border: none;
-    box-shadow: inset 0px 0px 5px -1px rgba(0,0,0,0.75);
-    margin: 10px auto 10px;
-  }
-  textarea {
-    @extend input;
-    height: 60px;
-  }
-  button {
-    @extend input;
-    height: 30px;
-    background-color: rgba(0, 88, 43, 0.5);
-    box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
-  }
-  .container {
-    margin: 30px;
-    display: grid;
-    grid-template-columns: repeat(4, auto);
-    gap: 20px;
+}
 
-    .card {
-      padding: 10px;
-      box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+h1, h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(10, 36, 36);
+}
 
-      h3 {
-        color: rgb(0, 88, 43);
-        text-transform: uppercase;
+  p {
+    width: 80%;
+    margin: 30px auto;
+}
+
+  ul {
+    @extend p;
+    @extend h1;
+    list-style: none;
+
+    li {
+      margin: 0 12px;
+
+      a {
+        text-decoration:  none;
+        display: block;
+        color: rgb(0, 92, 128);
+        border: 1px solid;
+        padding: 5px;
       }
     }
-  }
+  
+}
+
+img {
+  @extend h1;
+  @extend p;
+  width: 100px;
+  height: auto;
 }
 </style>

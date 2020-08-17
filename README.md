@@ -9,8 +9,10 @@
 [v-model](#v-model)   
 [v-on](#v-on)  
 [axios](#axios)  
-[Передача данных между компонентами](#props_emit)
-
+[class](#class)  
+[Передача данных между компонентами](#props_emit)  
+[vue-router](#vue-router)  
+[filters](#filters)  
 
 
 <a name="rendering"><h2>rendering</h2></a>
@@ -297,6 +299,53 @@ export default {
   }
 };
 ```
+<a name="class"><h3>class</h3></a>  
+
+Динамическое добавление классов с помощью директивы **v-bind**  
+**:class="{red: completed}"** - добавить класс **red** при условии **completed = true**  
+**@click="byClass"** - функция которая изменяет значение completed на противоположное
+
+```html
+<template>
+  <div id="app">
+    <div class="block" 
+      :class="{red: completed}"
+      @click="byClass">      
+    </div>
+  </div>
+</template>
+```
+
+```javascript
+export default {
+  name: "App",
+  data: () => ({
+    completed: false 
+  }),
+  methods: {
+    byClass() {
+      this.completed = !this.completed
+    }
+  }
+};
+```
+
+```scss
+.block{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
+  background: black;
+  color: white;
+}
+.red {
+  @extend .block;
+  background: red;
+}
+```
 
 <a name="props_emit"><h3>props_emit</h3></a>
 
@@ -413,6 +462,111 @@ export default {
   methods: {
     removeItem (id) {
       console.log(`App Vue ${id}`)
+    }
+  }
+};
+```
+
+<a name="vue-router"><h3>vue-router</h3></a>  
+
+Многостраничные сайты на Vue  
+
+
+```bash
+npm i vue-router
+```
+Создать файл в корне src **route.js**  
+**mode: 'history'** - удаляет решетку в урлах  
+**import('./components/Home')** - динамический импорт  
+
+```javascript
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+export default new Router({
+  mode: 'history',
+  routes: [
+    {path: '/',
+     component: () => import('./components/Home')
+    },
+     {
+       path: '/i',
+       component: () => import('./components/ComponentI')
+     },
+     {
+      path: '/ii',
+      component: () => import('./components/ComponentII')
+    }
+  ]
+})
+```
+В **main.js** импорт и регистрация routera
+
+```javascript
+import Vue from "vue";
+import App from "./App.vue";
+import router from './route'
+
+Vue.config.productionTip = false;
+new Vue({
+  router,
+  render: h => h(App)
+}).$mount("#app");
+```
+
+### App.vue  
+
+**router-link** - это заменяет тег **a** и предотвращает перезагрузку страницы  
+**router-view** - это то место куда рендерятся компоненты после перехода по урлу
+
+```html
+<template>
+  <div id="app">
+    <nav>
+      <ul>
+        <li><router-link to="/">Home Component</router-link></li>
+        <li><router-link to="/i">Component I</router-link></li>
+        <li><router-link to="/ii">Component II</router-link></li>
+      </ul>
+    </nav>
+    <router-view />
+  </div>
+</template>
+```
+### Home.vue
+
+```html
+<template>
+  <div>
+    <h1>Home Component</h1>
+  </div>
+</template>
+```
+
+<a name="filters"><h2>filters</h2></a>
+
+```html
+<template>
+  <div id="app">
+    <h2>{{str | uppercase}}</h2>
+  </div>
+</template>
+```
+
+**uppercase** - имя функции-фильтра  
+**{{str | uppercase}}** - uppercase принимает аргумент **str**  
+
+```javascript
+export default {
+  name: "App",
+  data: () => ({
+    str: "String"
+  }),
+  filters: {
+    uppercase(value) {
+      return value.toUpperCase()
     }
   }
 };
