@@ -2,11 +2,14 @@
   <div id="app">
     <h1>{{ name }}</h1>
     <Header />
+    <br>
+    <Autocomplete />
   </div>
 </template>
 
 <script>
 import Header from './components/Header'
+import Autocomplete from './components/Autocomplete'
 export default {
   name: "App",
   data() {
@@ -15,7 +18,7 @@ export default {
     }
   },
   components: {
-    Header
+    Header, Autocomplete
   }
 
 };
