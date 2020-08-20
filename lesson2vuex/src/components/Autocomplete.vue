@@ -1,49 +1,50 @@
 <template>
   <div class="covid-block">
-    <h1>covid19</h1>
-    <!-- <div id="myDropdown" class="dropdown-content">
-    <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
-    <a href="#about">About</a>
-    <a href="#base">Base</a>
-    <a href="#blog">Blog</a>
-    <a href="#contact">Contact</a>
-    <a href="#custom">Custom</a>
-    <a href="#support">Support</a>
-    <a href="#tools">Tools</a>
-  </div> -->
+
+    <h1 class="h1">covid19</h1>
+
     <div class="input-block">
-      <input type="text" v-model="search" @input="onChange"/>
+      <input type="text" placeholder="search..." v-model="search"
+              @input="onChangeInput"
+              @keyup.38="keyArrowUp"
+              @keyup.40="keyArrowDown" 
+              @keyup.13="keyEnter"
+      />
       <div class="btn-block">
-        <span :class="{'btn-up': btnShowListCountries }" class="btn-down" @click="showList"></span>
-        <span class="btn-closse" v-if="search" @click="clossSearch"></span>
+        <span class="btn-down"
+              :class="{'btn-up': btnShowListCountries }"
+              @click="showList">
+        </span>
+        <span class="btn-closse"
+              v-if="search"
+              @click="clossSearch">
+        </span>
       </div>
     </div>
+
     <template v-if="objOneCountry">
       <div class="country">
-        <h3>Country: {{objOneCountry.Country}}</h3>
-        <p>New Confirmed: {{objOneCountry.NewConfirmed}}</p>
-        <p>New Deaths: {{objOneCountry.NewDeaths}}</p>
-        <p>New Recovered: {{objOneCountry.NewRecovered}}</p>
-        <p>Total Confirmed: {{objOneCountry.TotalConfirmed}}</p>
-        <p>Total Deaths: {{objOneCountry.TotalDeaths}}</p>
-        <p>Total Recovered: {{objOneCountry.TotalRecovered}}</p>
-        <span class="btn-closse" @click.self.prevent="closseCountry(objOneCountry)"></span>
+        <p v-for="(value, key) of objOneCountry" :key="key">{{key}}: {{value}}</p>
+        <span class="btn-closse" @click="closseCountry"></span>
       </div>
     </template>
-    <ul class="autocomplete-results">
-      <li v-for="(item, index) in results" 
-      :key="index"
-      >
-        <a @click.self.prevent="getC(item, index)" href=""
-        @keydown.down="onArrowDown"
-        @keydown.up="onArrowUp"
-        :class="{ 'is-active': index === arrowCounter }"
-        >{{item.Country}}</a>
-        <div class="btn-block">
-          <span class="btn-closse" @click.self.prevent="dellItem(item, index)"></span>
-        </div>
-      </li>
-    </ul>
+
+    <template v-if="search || btnShowListCountries">
+      <ul class="results-list">
+        <li v-for="(item, index) in results" :key="index" 
+            :class="{ 'is-active': index === arrowCounter }">
+          <a @click.self.prevent="showObjOneCountry(item, index)">
+              {{item.Country}}
+          </a>
+          <div class="btn-block">
+            <span class="btn-closse"
+                  @click.self.prevent="removeItem(item, index)">
+            </span>
+          </div>
+        </li>
+      </ul>
+    </template>
+
   </div>
 </template>
 <script>
@@ -60,45 +61,55 @@ import axios from 'axios'
         arrowCounter: -1,
       };
     },
-
+    watch: {
+      focusedElBeforeOpen: function() {
+        console.log(this.focusedElBeforeOpen);
+      }
+    },
     methods: {
-      onArrowDown() {
-        if (this.arrowCounter < this.results.length) {
-          this.arrowCounter = this.arrowCounter + 1;
-        }
-      },
-      onArrowUp() {
+      keyArrowUp() {
         if (this.arrowCounter > 0) {
           this.arrowCounter = this.arrowCounter - 1;
         }
+        console.log(this.results[this.arrowCounter], this.arrowCounter);
+      },
+      keyArrowDown() {
+        if (this.arrowCounter < this.results.length) {
+          this.arrowCounter = this.arrowCounter + 1;
+        }
+        console.log(this.results[this.arrowCounter], this.arrowCounter);
+      },
+      keyEnter() {
+        console.log("Enter", this.results[this.arrowCounter]);
+        this.showObjOneCountry(this.results[this.arrowCounter])
       },
       showList() {
+        console.log(this.btnShowListCountries);
         this.btnShowListCountries = !this.btnShowListCountries
         if (this.btnShowListCountries) {
           this.filterResults()
         } else this.results = []
       },
-      dellItem(item, index) {
-        console.log(item, index);
+      // remove item from the results
+      removeItem(item, index) {
         if (index === 0) {
           this.results.splice(0, 1);
         }
         else this.results.splice(index, index);
       },
-      closseCountry(value) {
-        console.log(value);
+      closseCountry() {
         this.objOneCountry = null
       },
       clossSearch() {
         this.search = ''
         this.filterResults()
       },
-      onChange() {
-        console.log(this.results);
+      // calls the filter function on input
+      onChangeInput() {
         this.filterResults()
       },
-      getC(value) {
-        console.log(value);
+      // display data of one country
+      showObjOneCountry(value) {
         this.search = value.Country
         this.filterResults()
         this.objOneCountry = value
@@ -115,10 +126,10 @@ import axios from 'axios'
   };
 </script>
 <style lang="scss" scope>
+
   .is-active {
     border-bottom: 2px solid #3e8e41;
   }
-
   .btn-down {
     font-size: 20px;
     margin: 0 5px;
@@ -131,7 +142,6 @@ import axios from 'axios'
       border: 1px solid;
     }
   }
-
   .btn-up {
     @extend .btn-down;
     &:after {
@@ -146,11 +156,25 @@ import axios from 'axios'
     }
   }
 
+  .grid {
+    display: grid;
+    grid-template-columns: 30% auto;
+    gap: 40px;
+    grid-template-areas: "h1 h1"
+                          "input-block input-block"
+                          "country results-list"
+  }
+  
+  .h1 {
+    grid-area: h1;
+  }
   .covid-block {
+    @extend .grid;
     width: 80vw;
     margin: 20px auto;
 
     .input-block {
+      grid-area: input-block;
       position: relative;
 
       .btn-block {
@@ -158,22 +182,24 @@ import axios from 'axios'
         top: 8px;
         right: -1px;
       }
-    }
+      
+      input {
+        outline: none;
+        width: 100%;
+        height: 30px;
+        padding: 2px;
+        font-size: 24px;
+        color: #122436;
+        border: none;
+        border-bottom: 1px #3e8e41 solid;
 
-    input {
-      outline: none;
-      width: 100%;
-      height: 30px;
-      padding: 2px;
-      font-size: 24px;
-      color: #122436;
-      border: none;
-      border-bottom: 1px #3e8e41 solid;
-      &:focus {
-        border-bottom: 2px solid #3e8e41;
+        &:focus {
+          border-bottom: 2px solid #3e8e41;
+        }
       }
     }
     .country {
+      grid-area: country;
       margin: 12px 0;
       padding: 10px;
       position: relative;
@@ -184,10 +210,13 @@ import axios from 'axios'
         right: 1px;
       }
     }
-    ul {
+    .results-list {
+      grid-area: results-list;
       height: 100%;
       list-style: none;
       padding-inline-start: 0;
+      overflow-y: scroll;
+      height: 50vh;
       li {
         margin: 24px 0;
         position: relative;
