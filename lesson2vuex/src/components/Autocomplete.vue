@@ -1,38 +1,49 @@
 <template>
   <div class="covid-block">
     <h1>covid19</h1>
-    <div>
-      <input type="text"
-            v-model="search"
-            @input="onChange"
-    />
+    <!-- <div id="myDropdown" class="dropdown-content">
+    <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+    <a href="#about">About</a>
+    <a href="#base">Base</a>
+    <a href="#blog">Blog</a>
+    <a href="#contact">Contact</a>
+    <a href="#custom">Custom</a>
+    <a href="#support">Support</a>
+    <a href="#tools">Tools</a>
+  </div> -->
+    <div class="input-block">
+      <input type="text" v-model="search" @input="onChange"/>
+      <div class="btn-block">
+        <span :class="{'btn-up': btnShowListCountries }" class="btn-down" @click="showList"></span>
+        <span class="btn-closse" v-if="search" @click="clossSearch"></span>
+      </div>
     </div>
-    <template v-if="oneEl">
+    <template v-if="objOneCountry">
       <div class="country">
-        <h3>Country: {{oneEl.Country}}</h3>
-        <p>New Confirmed: {{oneEl.NewConfirmed}}</p>
-        <p>New Deaths: {{oneEl.NewDeaths}}</p>
-        <p>New Recovered: {{oneEl.NewRecovered}}</p>
-        <p>Total Confirmed: {{oneEl.TotalConfirmed}}</p>
-        <p>Total Deaths: {{oneEl.TotalDeaths}}</p>
-        <p>Total Recovered: {{oneEl.TotalRecovered}}</p>
-        <button class="cls" @click.self.prevent="closseCountry(oneEl)">x</button>
+        <h3>Country: {{objOneCountry.Country}}</h3>
+        <p>New Confirmed: {{objOneCountry.NewConfirmed}}</p>
+        <p>New Deaths: {{objOneCountry.NewDeaths}}</p>
+        <p>New Recovered: {{objOneCountry.NewRecovered}}</p>
+        <p>Total Confirmed: {{objOneCountry.TotalConfirmed}}</p>
+        <p>Total Deaths: {{objOneCountry.TotalDeaths}}</p>
+        <p>Total Recovered: {{objOneCountry.TotalRecovered}}</p>
+        <span class="btn-closse" @click.self.prevent="closseCountry(objOneCountry)"></span>
       </div>
     </template>
-    <!-- <select name="" id="">
-      <option v-for="(item, index) in results" :key="index" :value="index">
-         <a :class="{focus: completed}" @click.self.prevent="getC(item, index)">{{item.Country}}</a>
-      </option>
-    </select> -->
     <ul class="autocomplete-results">
-      <li class="autocomplete-result" v-for="(item, index) in results" :key="index">
-        <a @click.self.prevent="getC(item, index)">{{item.Country}}
-          <span @click.self.prevent="dellItem(item, index)">x</span>
-        </a>
-        
+      <li v-for="(item, index) in results" 
+      :key="index"
+      >
+        <a @click.self.prevent="getC(item, index)" href=""
+        @keydown.down="onArrowDown"
+        @keydown.up="onArrowUp"
+        :class="{ 'is-active': index === arrowCounter }"
+        >{{item.Country}}</a>
+        <div class="btn-block">
+          <span class="btn-closse" @click.self.prevent="dellItem(item, index)"></span>
+        </div>
       </li>
     </ul>
-
   </div>
 </template>
 <script>
@@ -41,23 +52,32 @@ import axios from 'axios'
     name: 'autocomplete',
     data() {
       return {
-        currentItem: 1,
         search: '',
         results: [],
-        dataArr: null,
-        oneEl: null,
-        completed: false
+        btnShowListCountries: false,
+        arrDataCountries: null,
+        objOneCountry: null,
+        arrowCounter: -1,
       };
     },
-    watch: {
-      search: function() {
-        if (!this.search) {
-          this.oneEl = null
-          this.results = []
-        }
-      }
-    },
+
     methods: {
+      onArrowDown() {
+        if (this.arrowCounter < this.results.length) {
+          this.arrowCounter = this.arrowCounter + 1;
+        }
+      },
+      onArrowUp() {
+        if (this.arrowCounter > 0) {
+          this.arrowCounter = this.arrowCounter - 1;
+        }
+      },
+      showList() {
+        this.btnShowListCountries = !this.btnShowListCountries
+        if (this.btnShowListCountries) {
+          this.filterResults()
+        } else this.results = []
+      },
       dellItem(item, index) {
         console.log(item, index);
         if (index === 0) {
@@ -67,105 +87,129 @@ import axios from 'axios'
       },
       closseCountry(value) {
         console.log(value);
-        this.oneEl = null
+        this.objOneCountry = null
+      },
+      clossSearch() {
+        this.search = ''
+        this.filterResults()
       },
       onChange() {
         console.log(this.results);
         this.filterResults()
       },
       getC(value) {
-        this.oneEl = value
+        console.log(value);
+        this.search = value.Country
+        this.filterResults()
+        this.objOneCountry = value
       },
       filterResults() {
-        this.results = this.dataArr.filter(item => item.Country.toLowerCase().indexOf(this.search.toLowerCase()) > -1);
+        this.results = this.arrDataCountries.filter(item => item.Country.toLowerCase().indexOf(this.search.toLowerCase()) > -1);
       },
     },
     mounted() {
       axios
         .get('https://api.covid19api.com/summary')
-        .then(response => (this.dataArr = response.data.Countries))
+        .then(response => (this.arrDataCountries = response.data.Countries))
     } 
   };
 </script>
 <style lang="scss" scope>
-.focus {
-  border: red 1px solid;
-}
-.covid-block {
-  width: 80vw;
-  margin: 20px auto;
-
-  input {
-    width: 100%;
-    height: 30px;
-    padding: 2px;
-    font-size: 24px;
-    color: #122436;
-    border: 1px gray solid;
+  .is-active {
+    border-bottom: 2px solid #3e8e41;
   }
-  .country {
-    margin: 12px 0;
-    padding: 10px;
-    position: relative;
 
-    .cls {
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      border: none;
-      color: #f80000;
-      background: none;
-      position: absolute;
-      top: 29px;
-      right: 9px;
+  .btn-down {
+    font-size: 20px;
+    margin: 0 5px;
+    padding: 0 5px;
+    color: #0088f8;
+    &:after {
+      content: "\2193";
+    }
+    &:hover {
+      border: 1px solid;
     }
   }
-  ul {
-    height: 100%;
-    list-style: none;
-    padding-inline-start: 0;
-    li {
-      margin: 24px 0;
-      a {
-        cursor: pointer;
-        display: block;
-        color: #006fdd;
-        text-decoration: none;
-        border-bottom: 1px solid #dddddd;
 
-        span {
-          display: inline-block;
-          float: right;
-          color: #f80000;
-          padding: 0 12px;
+  .btn-up {
+    @extend .btn-down;
+    &:after {
+      content: "\2191";
+    }
+  }
+  .btn-closse {
+    @extend .btn-down;
+    color: #f80000;
+    &:after {
+      content: "\00D7";
+    }
+  }
+
+  .covid-block {
+    width: 80vw;
+    margin: 20px auto;
+
+    .input-block {
+      position: relative;
+
+      .btn-block {
+        position: absolute;
+        top: 8px;
+        right: -1px;
+      }
+    }
+
+    input {
+      outline: none;
+      width: 100%;
+      height: 30px;
+      padding: 2px;
+      font-size: 24px;
+      color: #122436;
+      border: none;
+      border-bottom: 1px #3e8e41 solid;
+      &:focus {
+        border-bottom: 2px solid #3e8e41;
+      }
+    }
+    .country {
+      margin: 12px 0;
+      padding: 10px;
+      position: relative;
+
+      span {
+        position: absolute;
+        top: 30px;
+        right: 1px;
+      }
+    }
+    ul {
+      height: 100%;
+      list-style: none;
+      padding-inline-start: 0;
+      li {
+        margin: 24px 0;
+        position: relative;
+        a {
+          font-size: 20px;
+          outline: none;
+          cursor: pointer;
+          display: block;
+          color: #006fdd;
+          text-decoration: none;
+          border-bottom: 1px solid #dddddd;
+
+          &:hover, &:focus {
+            @extend .is-active;
+          }
+        }
+        .btn-block {
+          position: absolute;
+          bottom: 5px;
+          right: 1px;
         }
       }
     }
   }
-}
 </style>
-
-a .autocomplete {
-//     position: relative;
-//     width: 130px;
-//   }
-
-//   .autocomplete-results {
-//     padding: 0;
-//     margin: 0;
-//     border: 1px solid #eeeeee;
-//     height: 120px;
-//     overflow: auto;
-//   }
-
-//   .autocomplete-result {
-//     list-style: none;
-//     text-align: left;
-//     padding: 4px 2px;
-//     cursor: pointer;
-//   }
-
-//   .autocomplete-result:hover {
-//     background-color: #4AAE9B;
-//     color: white;
-//   }
