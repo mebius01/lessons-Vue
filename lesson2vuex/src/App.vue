@@ -1,24 +1,18 @@
 <template>
   <div id="app">
-    <h1>{{ name }}</h1>
-    <Header />
-    <br>
     <Autocomplete />
   </div>
 </template>
 
 <script>
-import Header from './components/Header'
 import Autocomplete from './components/Autocomplete'
 export default {
   name: "App",
   data() {
-    return {
-      name: "Test Vuex"
-    }
+    return {}
   },
   components: {
-    Header, Autocomplete
+    Autocomplete
   }
 
 };
@@ -29,8 +23,9 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin: 60px auto;
+  h1 {
+  text-align: center;
+}
 }
 </style>
