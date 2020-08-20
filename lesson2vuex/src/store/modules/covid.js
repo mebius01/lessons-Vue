@@ -1,4 +1,4 @@
-// import axios from "axios"
+import axios from "axios"
 export default {
   namespaced: true,
   state: {
@@ -12,5 +12,11 @@ export default {
   },
   getters: {},
   mutations: {},
-  actions: {},
+  actions: {
+    getResponse() {
+      axios
+        .get(this.rootUrl)
+        .then(response => (this.arrDataCountries = response.data.Countries))
+    }
+  },
 }
