@@ -1,20 +1,21 @@
 <template>
   <div id="app">
-    <Autocomplete />
+
   </div>
 </template>
 
 <script>
-import Autocomplete from './components/Autocomplete'
+import { mapActions } from 'vuex'
 export default {
   name: "App",
   data() {
     return {}
   },
-  components: {
-    Autocomplete
+  mounted() {
+    ...mapActions({
+      "GET_SUMMARY"
+    })
   }
-
 };
 </script>
 

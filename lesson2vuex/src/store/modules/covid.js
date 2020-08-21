@@ -3,7 +3,7 @@ export default {
   namespaced: true,
   state: {
     rootUrl: "https://api.covid19api.com/summary",
-    search: '',
+    search: null,
     results: [],
     btnShowListCountries: false,
     arrDataCountries: null,
@@ -11,12 +11,17 @@ export default {
     arrowCounter: -1,
   },
   getters: {},
-  mutations: {},
-  actions: {
-    getResponse() {
-      axios
-        .get(this.rootUrl)
-        .then(response => (this.arrDataCountries = response.data.Countries))
+  mutations: {
+    SET_COUNTRIES: (state, data) => {
+      state.arrDataCountries = data
     }
   },
+  actions: {
+    GET_SUMMARY({ commit }) {
+      return axios.get("https://api.covid19api.com/summary")
+        .then(response => {
+          commit("SET_COUNTRIES", response)
+        })
+    }
+  }
 }
