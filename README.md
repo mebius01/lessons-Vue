@@ -13,6 +13,7 @@
 [Передача данных между компонентами](#props_emit)  
 [vue-router](#vue-router)  
 [filters](#filters)  
+[Vuex](#Vuex)
 
 
 <a name="rendering"><h2>rendering</h2></a>
@@ -570,4 +571,128 @@ export default {
     }
   }
 };
+```
+
+
+<a name="Vuex"><h1>Vuex</h1></a>
+
+**Состояние (State)**
+Состояние — это данные, хранящиеся в вашем приложении.  
+**Хранилище (Store)**
+Хранилище управляет состоянием. Оно должно изменяться только изнутри, поэтому внешние компоненты не могут напрямую изменять состояние.  
+**Геттеры (Getters)**
+Геттеры вычисляют свойства на основе состояния хранилища. Вы можете использовать их в своих действиях (actions) или непосредственно в своем компоненте.  
+**Мутации (Mutations)**
+Чтобы обновить состояние, вам нужно совершить мутацию. Мутация не заботится о бизнес-логике, ее единственной целью является обновление состояния. Мутация является синхронной.  
+**Действия/Экшены (Actions)**
+Действие содержит бизнес-логику и не заботится об обновлении состояния напрямую. Причина в том, что действия являются асинхронными  
+
+Структура:  
+
+```bash
+├── App.vue
+├── assets
+├── components
+│   └── Counter.vue
+├── main.js
+└── store
+    ├── index.js
+    └── modules
+        └── covid.js
+
+```
+
+**./store/index.js**  
+```javascript
+import Vue from "vue";
+import Vuex from "vuex";
+import covid from "./modules/covid";
+
+Vue.use(Vuex);
+export default new Vuex.Store({
+  modules: {
+    covid
+  }
+});
+
+```
+
+**./store/modules/covid.js**  
+```javascript
+export default {
+  namespaced: true,
+  state: {
+    arrowCounter: 0,
+  },
+  getters: {
+    COUNTER(state) {
+      return state.arrowCounter
+    }
+  },
+  mutations: {
+    CREATE_COUNTER: (state, payload) => {
+      state.arrowCounter = payload
+    }
+  },
+  actions: {
+    CHANGE_COUNTER_PLUS({commit, getters}) {
+      let c = getters.COUNTER+1
+      commit("CREATE_COUNTER", c)
+    },
+    CHANGE_COUNTER_MINUS({commit, getters}) {
+      let c = getters.COUNTER-1
+      commit("CREATE_COUNTER", c)
+    }
+  }
+}
+```
+**App.vue**  
+```html
+<template>
+  <div id="app">
+    <button @click="CHANGE_COUNTER_PLUS">+ 1</button>
+    <Counter />
+    <button @click="CHANGE_COUNTER_MINUS">- 1</button>
+  </div>
+</template>
+```
+
+```javascript
+import Counter from './components/Counter'
+import { mapActions, mapGetters } from 'vuex'
+export default {
+  name: "App",
+  components: {
+    Counter
+  },
+  data() {
+    return {}
+  },
+  computed: {},
+  methods: {
+    ...mapActions("covid", ["CHANGE_COUNTER_PLUS",
+                            "CHANGE_COUNTER_MINUS"
+    ]),
+  },
+};
+```
+
+```html
+<template>
+  <div>
+    {{COUNTER}}
+  </div>
+</template>
+```
+
+```javascript
+import { mapGetters } from 'vuex'
+export default {
+  data() {
+    return {}
+  },
+  computed: {
+    ...mapGetters("covid", ["COUNTER"]),
+  }
+}
 ```
